@@ -12,13 +12,12 @@ class RoutineWishRepository {
         }
     }
 
-    async createRoutineWish(wishId, weekDayId, routineDescription, routines) {
+    async createRoutineWish(wishId, weekDayId, routines) {
         await this.initRepository();
         const newRoutineWish = this.repository.create({
             wish_id: wishId,
             week_day_id: weekDayId,
-            routine_description: routineDescription,
-            routines: routines
+            routines: routines // JSONB field
         });
         return await this.repository.save(newRoutineWish);
     }
@@ -28,18 +27,17 @@ class RoutineWishRepository {
         return await this.repository.find({ where: { wish_id: wishId } });
     }
 
-    async updateRoutineWish(routineId, routineDescription, routines) {
+    async updateRoutineWish(routineId, routines) {
         await this.initRepository();
         await this.repository.update(routineId, {
-            routine_description: routineDescription,
-            routines: routines
+            routines: routines // Actualiza directamente el campo routines (JSONB)
         });
-        return await this.repository.findOne(routineId);
+        return await this.repository.findOne({ where: { id: routineId } });
     }
 
     async deleteRoutineWish(routineId) {
         await this.initRepository();
-        return await this.repository.delete(routineId);
+        return await this.repository.delete({ id: routineId });
     }
 }
 

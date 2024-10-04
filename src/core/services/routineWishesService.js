@@ -13,17 +13,17 @@ class RoutineWishService {
 
             const createdRoutines = [];
 
-            for (const [day, description] of Object.entries(routines)) {
+            for (const day of Object.keys(routines)) {
                 const weekDayId = process.env[day.toUpperCase()];
                 if (!weekDayId) {
                     throw new Error(`Día de la semana inválido: ${day}`);
                 }
-                const newRoutine = await this.routineWishRepository.createRoutineWish(
+
+                const newRoutine = await this.routineWishRepository.createRoutineWish({
                     wishId,
-                    weekDayId,
-                    description,
-                    routines
-                );
+                    weekDayId
+                });
+
                 createdRoutines.push(newRoutine);
             }
 
@@ -55,19 +55,17 @@ class RoutineWishService {
 
             const updatedRoutines = [];
 
-            for (const [day, description] of Object.entries(routines)) {
+            for (const day of Object.keys(routines)) {
                 const weekDayId = process.env[day.toUpperCase()];
                 if (!weekDayId) {
                     throw new Error(`Día de la semana inválido: ${day}`);
                 }
-                
-                const existingRoutine = await this.routineWishRepository.getRoutinesByWishId(wishId);
+
+                const existingRoutine = await this.routineWishRepository.getRoutineByWishAndDay(wishId, weekDayId);
 
                 if (existingRoutine) {
                     const updatedRoutine = await this.routineWishRepository.updateRoutineWish(
-                        existingRoutine.id,
-                        description,
-                        routines
+                        existingRoutine.id
                     );
                     updatedRoutines.push(updatedRoutine);
                 } else {

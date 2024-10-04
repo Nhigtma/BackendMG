@@ -20,13 +20,13 @@ class WishService {
     async createWishWithRoutine(title, description, user_id, category_id, routines, is_routine) {
         try {
             const newWish = await this.wishRepository.createWish(title, description, user_id, category_id, is_routine);
-    
+        
             let createdRoutines = [];
-            
+    
             if (is_routine && routines && Object.keys(routines).length > 0) {
-                createdRoutines = await this.RoutineWishRepository.createRoutineWish(newWish.id, routines);
+                createdRoutines = await this.routineWishRepository.createRoutineWish(newWish.id, routines);
             }
-
+    
             return {
                 wish: newWish,
                 routines: createdRoutines
@@ -37,7 +37,6 @@ class WishService {
             throw new Error('Error al crear un deseo con rutina: ' + error.message);
         }
     }
-
     async getWishById(id) {
         try {
             const wish = await this.wishRepository.getWishById(id);

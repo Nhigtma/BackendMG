@@ -15,9 +15,6 @@ const RoutineWish = new EntitySchema({
         week_day_id: {
             type: "uuid",
         },
-        routine_description: {
-            type: "text",
-        },
         routines: {
             type: "JSONB",
         }

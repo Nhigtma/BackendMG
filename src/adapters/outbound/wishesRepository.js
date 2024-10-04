@@ -25,7 +25,7 @@ class WishRepository {
 
     async getAllWishes(user_id) {
         await this.initRepository();
-        return await this.repository.find({ where: { user_id } });
+        return await this.repository.find({ where: { user_id, is_routine: false } });
     }
 
     async getWishesWithLists() {

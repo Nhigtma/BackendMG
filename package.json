@@ -24,6 +24,9 @@
     "react-router-dom": "^6.26.2",
     "react-scripts": "^5.0.1",
     "reflect-metadata": "^0.2.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "synaptic": "^1.1.4",
     "typeorm": "^0.3.20",
     "web-vitals": "^2.1.4"
   },

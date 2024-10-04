@@ -4,7 +4,7 @@ const WishService = require('../core/services/wishService');
 class RoutineWishController {
     constructor() {
         this.routineWishService = new RoutineWishService();
-        this.wishService = new  WishService();
+        this.wishService = new WishService();
     }
 
     async createWishWithRoutine(req, res) {
@@ -46,7 +46,7 @@ class RoutineWishController {
             return res.status(400).json({ message: error.message });
         }
     }
-    
+
     async getWishesWithLists(req, res) {
         try {
             const wishesWithLists = await this.wishService.getWishesWithLists();

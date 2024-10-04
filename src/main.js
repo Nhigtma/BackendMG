@@ -1,34 +1,38 @@
-require('dotenv').config();
-
 const express = require('express');
 const cors = require('cors');
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+// Rutas
 const userRoutes = require('../src/adapters/inbound/userRoutes');
 const wishesRoutes = require('../src/adapters/inbound/wishRoutes');
-const categoryRoutes = require('../src/adapters/inbound/categoryRoutes')
-const routineWishesRoutes = require('../src/adapters/inbound/routineWishesRoutes')
+const categoryRoutes = require('../src/adapters/inbound/categoryRoutes');
+const routineWishesRoutes = require('../src/adapters/inbound/routineWishesRoutes');
 const { AppDataSource } = require('../src/config/ormConfig');
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-const allowedOrigins = [
-    'http://localhost:3000',
-    'https://tu-frontend.vercel.app'
-];
-
-const corsOptions = {
-    origin: (origin, callback) => {
-        if (allowedOrigins.includes(origin) || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('No permitido por CORS'));
-        }
+// Configuración de Swagger
+const swaggerOptions = {
+    swaggerDefinition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'API de Gestión de Deseos',
+            version: '1.0.0',
+            description: 'API para gestionar deseos, rutinas y categorías.',
+        },
+        servers: [
+            {
+                url: `http://localhost:${PORT}`,
+            },
+        ],
     },
-    methods: 'GET,POST,PUT,DELETE',
-    allowedHeaders: 'Content-Type,Authorization',
-    credentials: true,
+    apis: ['../src/adapters/inbound/*.js'],
 };
 
-app.use(cors(corsOptions));
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use(cors());
 app.use(express.json());
 app.use('/users', userRoutes);
 app.use('/protected/wishes', wishesRoutes);
