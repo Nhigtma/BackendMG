@@ -13,6 +13,7 @@
     "express-validator": "^7.2.0",
     "firebase": "^10.13.2",
     "firebase-admin": "^12.5.0",
+    "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "node-postgres": "^0.6.2",
     "pg": "^8.13.0",

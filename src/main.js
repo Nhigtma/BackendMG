@@ -10,7 +10,25 @@ const { AppDataSource } = require('../src/config/ormConfig');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors());
+const allowedOrigins = [
+    'http://localhost:3000',
+    'https://tu-frontend.vercel.app'
+];
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (allowedOrigins.includes(origin) || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('No permitido por CORS'));
+        }
+    },
+    methods: 'GET,POST,PUT,DELETE',
+    allowedHeaders: 'Content-Type,Authorization',
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use('/users', userRoutes);
 app.use('/protected/wishes', wishesRoutes);
@@ -25,6 +43,9 @@ app.use((err, req, res, next) => {
 AppDataSource.initialize()
     .then(() => {
         console.log('Conexión a la base de datos establecida.');
+        app.listen(PORT, () => {
+            console.log(`Servidor corriendo en http://localhost:${PORT}`);
+        });
     })
     .catch((error) => {
         console.error('Error al conectar a la base de datos:', error);
