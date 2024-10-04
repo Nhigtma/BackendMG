@@ -25,9 +25,6 @@ app.use((err, req, res, next) => {
 AppDataSource.initialize()
     .then(() => {
         console.log('Conexión a la base de datos establecida.');
-        app.listen(PORT, () => {
-            console.log(`Servidor corriendo en http://localhost:${PORT}`);
-        });
     })
     .catch((error) => {
         console.error('Error al conectar a la base de datos:', error);
