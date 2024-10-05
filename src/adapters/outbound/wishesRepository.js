@@ -17,6 +17,11 @@ class WishRepository {
         const wish = this.repository.create({ title, description, user_id, category_id, state_id });
         return await this.repository.save(wish);
     }
+    async createWishRoutine (title, description, user_id, category_id, is_routine,state_id) {
+        await this.initRepository();
+        const wish = this.repository.create({ title, description, user_id, category_id,is_routine, state_id });
+        return await this.repository.save(wish);
+    }
 
     async getWishById(id) {
         await this.initRepository();

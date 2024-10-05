@@ -9,7 +9,8 @@ class WishService {
 
     async createWish(title, description, user_id, category_id) {
         try {
-            const newWish = await this.wishRepository.createWish(title, description, user_id, category_id);
+            const state_id = process.env.EN_PROGRESO;
+            const newWish = await this.wishRepository.createWish(title, description, user_id, category_id,state_id );
             return newWish;
         } catch (error) {
             console.error('Error en createWish', error);
@@ -19,7 +20,8 @@ class WishService {
 
     async createWishWithRoutine(title, description, user_id, category_id, routines, is_routine) {
         try {
-            const newWish = await this.wishRepository.createWish(title, description, user_id, category_id, is_routine);
+            const state_id = process.env.RUTINA;
+            const newWish = await this.wishRepository.createWishRoutine(title, description, user_id, category_id, is_routine,state_id);
         
             let createdRoutines = [];
     
