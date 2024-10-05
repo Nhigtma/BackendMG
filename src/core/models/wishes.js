@@ -26,6 +26,10 @@ const Wish = new EntitySchema({
             type: "varchar",
             length: 255,
         },
+        wasperformed: {
+            type: "boolean",
+            default: false
+        },
         is_routine: {
             type: "boolean",
             default: "false"

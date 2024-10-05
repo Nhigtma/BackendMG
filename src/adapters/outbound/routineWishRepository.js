@@ -14,11 +14,18 @@ class RoutineWishRepository {
 
     async createRoutineWish(wishId, weekDayId, routines) {
         await this.initRepository();
+        console.log("deseo id " + wishId); // Asegúrate de que es un UUID válido
+        console.log("día " + weekDayId); // Asegúrate de que es un UUID válido
+        console.log("rutina " + routines); // Debe ser un JSON válido o string
+    
+        // Crea un nuevo objeto RoutineWish
         const newRoutineWish = this.repository.create({
-            wish_id: wishId,
-            week_day_id: weekDayId,
-            routines: routines // JSONB field
+            wish_id: wishId, // UUID válido para wish_id
+            week_day_id: weekDayId, // UUID válido para week_day_id
+            routines: routines // JSONB field, se recomienda serializar si es necesario
         });
+    
+        // Guarda la nueva rutina en la base de datos
         return await this.repository.save(newRoutineWish);
     }
 

@@ -1,7 +1,7 @@
 const { EntitySchema } = require('typeorm');
 
 const RoutineWish = new EntitySchema({
-    name: "Routine_wish",
+    name: "routine_wish",
     tableName: "routine_wish",
     columns: {
         id: {
@@ -16,7 +16,7 @@ const RoutineWish = new EntitySchema({
             type: "uuid",
         },
         routines: {
-            type: "JSONB",
+            type: "jsonb",
         }
     }
 });

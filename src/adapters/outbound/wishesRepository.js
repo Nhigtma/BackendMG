@@ -30,12 +30,12 @@ class WishRepository {
 
     async getAllWishes(user_id) {
         await this.initRepository();
-        return await this.repository.find({ where: { user_id, is_routine: false } });
+        return await this.repository.find({ where: { user_id, is_routine: false, state_id: process.env.EN_PROGRESO } });
     }
 
     async getWishesWithLists() {
         try {
-            return await this.repository.find({ where: { is_routine: true } });
+            return await this.repository.find({ where: { is_routine: true , state_id: process.env.RUTINA} });
         } catch (error) {
             console.error('Error en getWishesWithLists', error);
             throw new Error('Error al obtener los deseos con listas: ' + error.message);

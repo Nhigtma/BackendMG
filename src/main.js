@@ -2,17 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-// Rutas
 const userRoutes = require('../src/adapters/inbound/userRoutes');
 const wishesRoutes = require('../src/adapters/inbound/wishRoutes');
 const categoryRoutes = require('../src/adapters/inbound/categoryRoutes');
 const routineWishesRoutes = require('../src/adapters/inbound/routineWishesRoutes');
 const { AppDataSource } = require('../src/config/ormConfig');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Configuración de Swagger
 const swaggerOptions = {
     swaggerDefinition: {
         openapi: '3.0.0',

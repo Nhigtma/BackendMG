@@ -1,10 +1,12 @@
 const WishRepository = require('../../adapters/outbound/wishesRepository');
 const RoutineWishRepository = require('../../adapters/outbound/routineWishRepository');
+const routineWishService = require('../../core/services/routineWishesService');
 
 class WishService {
     constructor() {
         this.wishRepository = new WishRepository();
         this.RoutineWishRepository = new RoutineWishRepository();
+        this.routineWishService = new routineWishService();
     }
 
     async createWish(title, description, user_id, category_id) {
@@ -26,7 +28,9 @@ class WishService {
             let createdRoutines = [];
     
             if (is_routine && routines && Object.keys(routines).length > 0) {
-                createdRoutines = await this.routineWishRepository.createRoutineWish(newWish.id, routines);
+                console.log(newWish.id);
+                console.log(routines);
+                createdRoutines = await this.routineWishService.createRoutineWish(newWish.id, routines);
             }
     
             return {

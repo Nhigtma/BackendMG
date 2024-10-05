@@ -6,6 +6,7 @@ const Comment = require('../core/models/comment');
 const History = require('../core/models/history');
 const WishesOnStreak = require('../core/models/wishesOnStreak');
 const WishesState = require('../core/models/WishesState');
+const RoutineWishes = require('../core/models/routineWish');
 
 const connectionOptions = {
     type: 'postgres',
@@ -16,7 +17,7 @@ const connectionOptions = {
     database: process.env.DB_NAME || 'modo_guerra',
     synchronize: false,
     logging: true,
-    entities: [User,Wish,Category,Comment,History,WishesOnStreak,WishesState],
+    entities: [User,Wish,Category,Comment,History,WishesOnStreak,WishesState,RoutineWishes],
     ssl: {
         rejectUnauthorized: true,
     },

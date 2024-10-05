@@ -9,12 +9,20 @@ class RoutineWishController {
 
     async createWishWithRoutine(req, res) {
         const { title, description, user_id, category_id, routines, is_routine } = req.body;
-
+    
         try {
+            console.log('Datos recibidos:');
+            console.log('Title:', title);
+            console.log('Description:', description);
+            console.log('User ID:', user_id);
+            console.log('Category ID:', category_id);
+            console.log('Routines:', routines);
+            console.log('Is Routine:', is_routine);
+    
             if (!title || !description || !user_id || !category_id || !routines || !is_routine) {
                 return res.status(400).json({ message: "Faltan datos requeridos." });
             }
-
+    
             const result = await this.wishService.createWishWithRoutine(
                 title,
                 description,
@@ -23,13 +31,13 @@ class RoutineWishController {
                 routines,
                 is_routine
             );
-
+    
             return res.status(201).json({
                 message: "Deseo creado con éxito",
                 wish: result.wish,
                 routines: result.routines
             });
-
+    
         } catch (error) {
             console.error('Error en createWishWithRoutine:', error.message);
             return res.status(500).json({ message: "Error al crear el deseo con rutina: " + error.message });
