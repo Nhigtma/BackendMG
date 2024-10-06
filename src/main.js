@@ -9,6 +9,7 @@ const categoryRoutes = require('../src/adapters/inbound/categoryRoutes');
 const routineWishesRoutes = require('../src/adapters/inbound/routineWishesRoutes');
 const historyRoutes = require('../src/adapters/inbound/historyRoutes');
 const userPoints = require('../src/adapters/inbound/userPointsRoutes');
+const commentRoutes = require('../src/adapters/inbound/commentRoutes');
 const { AppDataSource } = require('../src/config/ormConfig');
 require('dotenv').config();
 
@@ -42,6 +43,7 @@ app.use('/protected/category', categoryRoutes);
 app.use('/protected/routines', routineWishesRoutes);
 app.use('/protected/history', historyRoutes);
 app.use('/protected/points', userPoints);
+app.use('/protected/comment', commentRoutes)
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
