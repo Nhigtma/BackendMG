@@ -34,6 +34,10 @@ const Wish = new EntitySchema({
             type: "boolean",
             default: "false"
         },
+        weekly_counter: {
+            type: "int",
+            default: 0,
+        },
         created_at: {
             type: "timestamp",
             default: () => "CURRENT_TIMESTAMP",

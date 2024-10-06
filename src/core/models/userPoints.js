@@ -1,3 +1,5 @@
+const { EntitySchema } = require('typeorm');
+
 const userPoints = new EntitySchema({
     name: "UserPoints",
     tablename: "user_points",
@@ -6,6 +8,10 @@ const userPoints = new EntitySchema({
             type: "uuid",
             primary: true,
             generated: "uuid"
+        },
+        user_id: {
+            type: "varchar",
+            nullable: false
         },
         points: {
             type: "int",
@@ -19,4 +25,5 @@ const userPoints = new EntitySchema({
         }
     }
 });
-module.exports = userPoints
+
+module.exports = userPoints;

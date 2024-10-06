@@ -39,6 +39,15 @@ const wishController = new WishController();
  *           type: string
  *           format: date-time
  *           description: La fecha y hora de la última actualización del deseo.
+ *         wasperformed:
+ *           type: boolean
+ *           description: Si la rutina fue realizada o no.
+ *         is_routine:
+ *           type: boolean
+ *           description: Indica si es una rutina.
+ *         weekly_counter:
+ *           type: integer
+ *           description: Contador semanal de rutinas cumplidas.
  *       required:
  *         - user_id
  *         - title
@@ -180,5 +189,88 @@ router.put('/:id', authMiddleware, (req, res) => wishController.updateWish(req, 
  *         description: Error al eliminar el deseo
  */
 router.delete('/:id', authMiddleware, (req, res) => wishController.deleteWish(req, res));
+
+/**
+ * @swagger
+ * /protected/wishes/complete/{wish_id}:
+ *   post:
+ *     summary: Marca un deseo como completado
+ *     tags: [Wishes]
+ *     parameters:
+ *       - name: wish_id
+ *         in: path
+ *         required: true
+ *         description: ID del deseo que se quiere completar
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: string
+ *                 description: ID del usuario que completa el deseo.
+ *     responses:
+ *       200:
+ *         description: Deseo completado
+ *       500:
+ *         description: Error al completar el deseo
+ */
+router.post('/complete/:wish_id', authMiddleware, (req, res) => wishController.completeWish(req, res));
+
+/**
+ * @swagger
+ * /protected/wishes/performRoutine/{wish_id}:
+ *   post:
+ *     summary: Marca la rutina del deseo como realizada
+ *     tags: [Wishes]
+ *     parameters:
+ *       - name: wish_id
+ *         in: path
+ *         required: true
+ *         description: ID del deseo con rutina
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: string
+ *                 description: ID del usuario que realizó la rutina.
+ *     responses:
+ *       200:
+ *         description: Rutina marcada como realizada
+ *       500:
+ *         description: Error al realizar la rutina
+ */
+router.post('/performRoutine/:wish_id', authMiddleware, (req, res) => wishController.performRoutine(req, res));
+
+/**
+ * @swagger
+ * /protected/wishes/resetWasPerformed/{user_id}:
+ *   post:
+ *     summary: Reinicia el estado "wasperformed" de las rutinas del usuario
+ *     tags: [Wishes]
+ *     parameters:
+ *       - name: user_id
+ *         in: path
+ *         required: true
+ *         description: ID del usuario
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Estado "wasperformed" reiniciado
+ *       500:
+ *         description: Error al reiniciar el estado "wasperformed"
+ */
+router.post('/resetWasPerformed/:user_id', authMiddleware, (req, res) => wishController.resetWasPerformed(req, res));
 
 module.exports = router;

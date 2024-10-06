@@ -59,7 +59,7 @@ const routineWishController = new RoutineWishController();
 
 /**
  * @swagger
- * /wishesRoutine:
+ * /protected/routines/wishesRoutine:
  *   post:
  *     summary: Crear un deseo con rutina
  *     tags: [RoutineWishes]
@@ -112,7 +112,7 @@ router.post('/wishesRoutine', authMiddleware, (req, res) => routineWishControlle
 
 /**
  * @swagger
- * /wishes/{wishId}/routines:
+ * /protected/routines/wishes/{wishId}/routines:
  *   get:
  *     summary: Obtener rutinas por ID de deseo
  *     tags: [RoutineWishes]
@@ -139,7 +139,7 @@ router.get('/wishes/:wishId/routines', authMiddleware, (req, res) => routineWish
 
 /**
  * @swagger
- * /allRoutines:
+ * /protected/routines/allRoutines:
  *   get:
  *     summary: Obtener todos los deseos con sus rutinas
  *     tags: [RoutineWishes]
@@ -194,7 +194,7 @@ router.get('/allRoutines', authMiddleware, (req, res) => routineWishController.g
 
 /**
  * @swagger
- * /wishes/{wishId}/routines:
+ * /protected/routines/wishes/{wishId}/routines:
  *   put:
  *     summary: Actualizar rutinas de un deseo
  *     tags: [RoutineWishes]
@@ -232,7 +232,7 @@ router.put('/wishes/:wishId/routines', authMiddleware, (req, res) => routineWish
 
 /**
  * @swagger
- * /wishes/routines/{routineId}:
+ * /protected/routines/wishes/routines/{routineId}:
  *   delete:
  *     summary: Eliminar una rutina
  *     tags: [RoutineWishes]

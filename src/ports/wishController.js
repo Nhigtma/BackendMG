@@ -74,6 +74,44 @@ class WishController {
             res.status(500).json({ error: 'Error al eliminar el deseo: ' + error.message });
         }
     }
+
+    async completeWish(req, res) {
+        const {wish_id} = req.params;
+        const {user_id} = req.body;
+
+        try {
+            const completeWish = await this.wishService.completeWish(wish_id, user_id);
+            res.status(200).json(completeWish);
+        } catch (error) {
+            console.error('error en completeWish: ', error.message);
+            res.status(500).json({ error: 'Error al completar el deseo: ' + error.message});
+        }
+    }
+
+    async performRoutine (req, res) {
+        const {wish_id} = req.params;
+        const {user_id} = req.body;
+
+        try {
+            const performRoutine = await this.wishService.performRoutine(wish_id, user_id);
+            res.status(200).json(performRoutine);
+        } catch (error) {
+            console.error('Error al realizar la rutina: ', error.message);
+            res.status(500).json({error: 'Error al realizar la rutina ' + error.message});
+        }
+    }
+
+    async resetWasPerformed(req, res){
+        const {user_id} = req.params;
+
+        try {
+            const resetWasPerformed = await this.wishService.resetWasPerformed(user_id);
+            res.status(200).json(resetWasPerformed);
+        } catch (error) {
+            console.error('Error al aplicar resetWasPerformed: ', error.message);
+            res.status(500).json({error: 'Error al aplicar resetWasPerformed ' + error.message});
+        }
+    }
 }
 
 module.exports = WishController;

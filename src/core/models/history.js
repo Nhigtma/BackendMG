@@ -9,17 +9,14 @@ const History = new EntitySchema({
             primary: true,
             generated: "uuid"
         },
-        wish_id: {
-            type: "uuid",
-            nullable: false
-        },
         user_id: {
             type: "varchar",
             nullable: false
         },
-        points: {
+        highest_score: {
             type: "int",
-            nullable: false
+            nullable: false,
+            default: 0
         },
         completed_at: {
             type: "timestamp",

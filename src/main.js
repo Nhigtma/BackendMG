@@ -1,11 +1,14 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const userRoutes = require('../src/adapters/inbound/userRoutes');
 const wishesRoutes = require('../src/adapters/inbound/wishRoutes');
 const categoryRoutes = require('../src/adapters/inbound/categoryRoutes');
 const routineWishesRoutes = require('../src/adapters/inbound/routineWishesRoutes');
+const historyRoutes = require('../src/adapters/inbound/historyRoutes');
+const userPoints = require('../src/adapters/inbound/userPointsRoutes');
 const { AppDataSource } = require('../src/config/ormConfig');
 require('dotenv').config();
 
@@ -26,7 +29,7 @@ const swaggerOptions = {
             },
         ],
     },
-    apis: ['../src/adapters/inbound/*.js'],
+    apis: [path.join(__dirname, '../src/adapters/inbound/*.js')],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
@@ -37,6 +40,8 @@ app.use('/users', userRoutes);
 app.use('/protected/wishes', wishesRoutes);
 app.use('/protected/category', categoryRoutes);
 app.use('/protected/routines', routineWishesRoutes);
+app.use('/protected/history', historyRoutes);
+app.use('/protected/points', userPoints);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);

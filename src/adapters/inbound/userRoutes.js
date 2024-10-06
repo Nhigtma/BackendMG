@@ -43,7 +43,7 @@ const userController = new UserController(userService);
 
 /**
  * @swagger
- * /protected/users/register:
+ *  /users/register:
  *   post:
  *     summary: Registra un nuevo usuario
  *     tags: [Users]
@@ -86,7 +86,7 @@ router.post('/register', (req, res) => userController.register(req, res));
 
 /**
  * @swagger
- * /protected/users/login:
+ *  /users/login:
  *   post:
  *     summary: Inicia sesión un usuario existente
  *     tags: [Users]
