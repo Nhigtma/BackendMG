@@ -9,8 +9,8 @@ const Comment = new EntitySchema({
             primary: true,
             generated: true
         },
-        wish_id: {
-            type: "uuid",
+        user_id: {
+            type: "varchar",
         },
         comment_text: {
             type: "varchar",

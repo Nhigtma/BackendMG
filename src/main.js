@@ -10,7 +10,9 @@ const routineWishesRoutes = require('../src/adapters/inbound/routineWishesRoutes
 const historyRoutes = require('../src/adapters/inbound/historyRoutes');
 const userPoints = require('../src/adapters/inbound/userPointsRoutes');
 const commentRoutes = require('../src/adapters/inbound/commentRoutes');
+const reminderRoutes = require('../src/adapters/inbound/reminderRoutes');
 const { AppDataSource } = require('../src/config/ormConfig');
+const initializeScheduler = require('../src/config/scheduler');
 require('dotenv').config();
 
 const app = express();
@@ -43,7 +45,8 @@ app.use('/protected/category', categoryRoutes);
 app.use('/protected/routines', routineWishesRoutes);
 app.use('/protected/history', historyRoutes);
 app.use('/protected/points', userPoints);
-app.use('/protected/comment', commentRoutes)
+app.use('/protected/comment', commentRoutes);
+app.use('/protected/reminders', reminderRoutes);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
@@ -53,9 +56,12 @@ app.use((err, req, res, next) => {
 AppDataSource.initialize()
     .then(() => {
         console.log('Conexión a la base de datos establecida.');
-        app.listen(PORT, () => {
+        
+        app.server = app.listen(PORT, () => {
             console.log(`Servidor corriendo en http://localhost:${PORT}`);
         });
+
+        initializeScheduler(app);
     })
     .catch((error) => {
         console.error('Error al conectar a la base de datos:', error);

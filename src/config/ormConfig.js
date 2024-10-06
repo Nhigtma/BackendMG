@@ -9,6 +9,7 @@ const WishesState = require('../core/models/WishesState');
 const RoutineWishes = require('../core/models/routineWish');
 const UserPoints = require('../core/models/userPoints');
 const Week =  require('../core/models/week');
+const remainders =  require('../core/models/reminders');
 
 const connectionOptions = {
     type: 'postgres',
@@ -19,7 +20,7 @@ const connectionOptions = {
     database: process.env.DB_NAME || 'modo_guerra',
     synchronize: false,
     logging: true,
-    entities: [User, Wish, Category, Comment, History, WishesOnStreak, WishesState, RoutineWishes, UserPoints, Week],
+    entities: [User, Wish, Category, Comment, History, WishesOnStreak, WishesState, RoutineWishes, UserPoints, Week, remainders],
     ssl: {
         rejectUnauthorized: true,
     },
