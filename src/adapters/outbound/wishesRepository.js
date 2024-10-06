@@ -50,6 +50,16 @@ class WishRepository {
         }
     }
 
+    async getwishesByCategory (category_id){
+        try {
+            return await this.repository.find({where: {category_id : category_id} })
+        } catch (error) {
+            console.error('Error en getWishesByCategory', error);
+            throw new Error('Error al obtener los deseos de la categoria: ' + error.message);
+        }
+
+    }
+
     async getWishesFinalizados(user_id) {
         try {
             return await this.repository.find({ where: {user_id, state_id: this.estados.FINALIZADA } });

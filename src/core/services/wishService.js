@@ -144,7 +144,7 @@ class WishService {
         }
     }
 
-    async performRoutine (wish_id, user_id) {
+    async performRoutine(wish_id, user_id) {
         try {
             const wish = this.wishRepository.getWishById(wish_id);
             await this.wishRepository.updateWeeklyCounter(wish);
@@ -158,22 +158,22 @@ class WishService {
     async resetWasPerformed(user_id) {
         const wishes = await this.getWishesWithLists(user_id);
         let updated = false;
-    
+
         for (const wish of wishes) {
             const now = new Date();
             const lastUpdate = new Date(wish.updated_at);
             const oneDay = 24 * 60 * 60 * 1000;
-    
+
             if ((now - lastUpdate) > oneDay) {
                 const updatedWish = await this.wishRepository.updateWasPerformed(wish.id);
                 if (updatedWish) {
                     updated = true;
                 } else {
-                    return 'No se cumplió con la rutina diaria. Se han reiniciado los puntos y el multiplicador.'; 
+                    return 'No se cumplió con la rutina diaria. Se han reiniciado los puntos y el multiplicador.';
                 }
             }
         }
-    
+
         return updated ? 'Rutinas actualizadas correctamente.' : 'No se encontraron rutinas que actualizar.';
     }
 
@@ -186,6 +186,15 @@ class WishService {
                 newCounter = 0;
             }
             await this.wishRepository.updateWeeklyCounter(wish.id, newCounter);
+        }
+    }
+
+    async getWishByCategory(category_id) {
+        try {
+            return await this.wishRepository.getwishesByCategory(category_id);
+        } catch (error) {
+            console.error('Error en getWishesByCategory', error);
+            throw new Error('Error al obtener los deseos de category: ' + error.message);
         }
     }
 }

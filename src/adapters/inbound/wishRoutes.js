@@ -272,5 +272,24 @@ router.post('/performRoutine/:wish_id', authMiddleware, (req, res) => wishContro
  *         description: Error al reiniciar el estado "wasperformed"
  */
 router.post('/resetWasPerformed/:user_id', authMiddleware, (req, res) => wishController.resetWasPerformed(req, res));
-
+/**
+ * @swagger
+ * /protected/wishes/category/{category_id}:
+ *   post:
+ *     summary: Obtiene los deseos pertenecientes a una categoria
+ *     tags: [Wishes]
+ *     parameters:
+ *       - name: category_id
+ *         in: path
+ *         required: true
+ *         description: ID de la categoria
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: obteniendo deseos de la categoria
+ *       500:
+ *         description: Error al obtener los deseos de la categorias
+ */
+router.get('/category/:category_id', authMiddleware, (req,res) => wishController.getWishByCategory(req,res));
 module.exports = router;

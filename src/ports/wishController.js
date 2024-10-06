@@ -112,6 +112,18 @@ class WishController {
             res.status(500).json({error: 'Error al aplicar resetWasPerformed ' + error.message});
         }
     }
+
+    async getWishByCategory (req,res){
+        const {category_id} = req.params;
+
+        try {
+            const wishes = await this.wishService.getWishByCategory(category_id);
+            res.status(200).json(wishes);
+        } catch (error) {
+            console.error('Error en getWishByCategory: ', error.message);
+            res.status(500).json({error: 'Error al obtener los deseos de la categoria ' + error.message});
+        }
+    }
 }
 
 module.exports = WishController;
