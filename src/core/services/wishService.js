@@ -25,7 +25,9 @@ class WishService {
     async createWish(title, description, user_id, category_id) {
         try {
             const state_id = this.estados.EN_PROGRESO;
-            const newWish = await this.wishRepository.createWish(title, description, user_id, category_id, state_id);
+            const daylyCounter = 0;
+            const wasperformed = false;
+            const newWish = await this.wishRepository.createWish(title, description, user_id, category_id, state_id, daylyCounter, wasperformed);
             return newWish;
         } catch (error) {
             console.error('Error en createWish', error);
@@ -36,7 +38,9 @@ class WishService {
     async createWishWithRoutine(title, description, user_id, category_id, routines, is_routine) {
         try {
             const state_id = this.estados.RUTINA;
-            const newWish = await this.wishRepository.createWishRoutine(title, description, user_id, category_id, is_routine, state_id);
+            const daylyCounter = 0;
+            const wasperformed = false;
+            const newWish = await this.wishRepository.createWishRoutine(title, description, user_id, category_id, is_routine, state_id, daylyCounter, wasperformed);
 
             let createdRoutines = [];
 
@@ -191,7 +195,9 @@ class WishService {
 
     async getWishByCategory(category_id) {
         try {
-            return await this.wishRepository.getwishesByCategory(category_id);
+            const wishes = await this.wishRepository.getWishesByCategory(category_id);
+            console.log (wishes);
+            return wishes;
         } catch (error) {
             console.error('Error en getWishesByCategory', error);
             throw new Error('Error al obtener los deseos de category: ' + error.message);

@@ -118,6 +118,7 @@ class WishController {
 
         try {
             const wishes = await this.wishService.getWishByCategory(category_id);
+            console.log(wishes);
             res.status(200).json(wishes);
         } catch (error) {
             console.error('Error en getWishByCategory: ', error.message);

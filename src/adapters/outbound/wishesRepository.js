@@ -1,6 +1,7 @@
 const { AppDataSource } = require('../../config/ormConfig');
 const Wish = require('../../core/models/wishes');
 const UserPointsRepository = require('../../adapters/outbound/userPointsRepository');
+const { validate: isUuid } = require('uuid');
 
 
 class WishRepository {
@@ -20,14 +21,14 @@ class WishRepository {
         }
     }
 
-    async createWish(title, description, user_id, category_id, state_id) {
+    async createWish(title, description, user_id, category_id, state_id, weekly_counter, wasperformed) {
         await this.initRepository();
-        const wish = this.repository.create({ title, description, user_id, category_id, state_id });
+        const wish = this.repository.create({ title, description, user_id, category_id, state_id, weekly_counter, wasperformed });
         return await this.repository.save(wish);
     }
-    async createWishRoutine(title, description, user_id, category_id, is_routine, state_id) {
+    async createWishRoutine(title, description, user_id, category_id, is_routine, weekly_counter, wasperformed) {
         await this.initRepository();
-        const wish = this.repository.create({ title, description, user_id, category_id, is_routine, state_id });
+        const wish = this.repository.create({ title, description, user_id, category_id, is_routine, state_id, weekly_counter, wasperformed });
         return await this.repository.save(wish);
     }
 
@@ -50,19 +51,35 @@ class WishRepository {
         }
     }
 
-    async getwishesByCategory (category_id){
+    async getWishesByCategory(category_id) {
+        await this.initRepository();
         try {
-            return await this.repository.find({where: {category_id : category_id} })
+            console.log(`Buscando deseos para la categoría: ${category_id}`);
+            if (!category_id || !isUuid(category_id)) {
+                throw new Error('El ID de la categoría es inválido o requerido.');
+            }
+    
+            const wishes = await this.repository.find({
+                where: { category_id }
+            });
+    
+            console.log(`Deseos encontrados:`, wishes);
+    
+            if (wishes.length === 0) {
+                console.log(`No se encontraron deseos para la categoría con ID: ${category_id}`);
+            }
+    
+            return wishes;
         } catch (error) {
-            console.error('Error en getWishesByCategory', error);
-            throw new Error('Error al obtener los deseos de la categoria: ' + error.message);
+            console.error('Error en getWishesByCategory:', error.message || error);
+            throw new Error('Error al obtener los deseos de la categoría.');
         }
-
     }
+    
 
     async getWishesFinalizados(user_id) {
         try {
-            return await this.repository.find({ where: {user_id, state_id: this.estados.FINALIZADA } });
+            return await this.repository.find({ where: { user_id, state_id: this.estados.FINALIZADA } });
         } catch (error) {
             console.error('Error en getWishesFinalizados', error);
             throw new Error('Error al obtener los deseos finalizados: ' + error.message);

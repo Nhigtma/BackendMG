@@ -32,11 +32,13 @@ const Wish = new EntitySchema({
         },
         is_routine: {
             type: "boolean",
-            default: "false"
+            default: false,
+            nullable: false
         },
         weekly_counter: {
             type: "int",
             default: 0,
+            nullable: false
         },
         created_at: {
             type: "timestamp",

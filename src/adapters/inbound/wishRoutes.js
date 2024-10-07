@@ -275,7 +275,7 @@ router.post('/resetWasPerformed/:user_id', authMiddleware, (req, res) => wishCon
 /**
  * @swagger
  * /protected/wishes/category/{category_id}:
- *   post:
+ *   get:
  *     summary: Obtiene los deseos pertenecientes a una categoria
  *     tags: [Wishes]
  *     parameters:
