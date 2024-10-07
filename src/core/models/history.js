@@ -31,5 +31,4 @@ const History = new EntitySchema({
     }
 });
 
-
 module.exports = History;

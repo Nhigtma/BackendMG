@@ -261,7 +261,7 @@ router.delete('/wishes/routines/:routineId', authMiddleware, (req, res) => routi
 /**
      * @swagger
      * /protected/routines/generate-pdf/{userId}:
-     *   post:
+     *   get:
      *     summary: Generar un PDF con rutinas de un usuario
      *     tags: [Routines]
      *     security:
@@ -284,6 +284,6 @@ router.delete('/wishes/routines/:routineId', authMiddleware, (req, res) => routi
      *       500:
      *         description: Error al generar el PDF
      */
-router.post('/generate-pdf/:userId', authMiddleware, (req, res) => routineWishController.generatePDF(req, res));
+router.get('/generate-pdf/:userId', authMiddleware, (req, res) => routineWishController.generatePDF(req, res));
 
 module.exports = router;

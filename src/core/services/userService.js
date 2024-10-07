@@ -51,6 +51,14 @@ class UserService {
             throw new Error('Token inválido: ' + error.message);
         }
     }
+
+    async getAllUsers(){
+        try {
+            return await this.userRepository.getAllUsers();
+        } catch (error) {
+            throw new Error('Error al obtener los usuarios' + error.message);
+        }
+    }
 }
 
 module.exports = UserService;
