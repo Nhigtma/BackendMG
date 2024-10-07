@@ -3,8 +3,9 @@ const RoutineWishRepository = require('../../adapters/outbound/routineWishReposi
 const routineWishService = require('../../core/services/routineWishesService');
 const UserPointsService = require('../services/userPointsService');
 const HistoryService = require('../services/historyServices');
-const PDFDocument = require('pdfkit');
 const fs = require('fs');
+const PDFDocument = require('pdfkit');
+const path = require('path');
 
 
 class WishService {
@@ -201,7 +202,8 @@ class WishService {
         }
     }
 
-    async generatePDF(userId) {
+    async generatePDF(req, res) {
+        const userId = req.params.userId;
         const dias = {
             LUNES: "3eaf730d-79f4-481b-9779-61f05370bf94",
             MARTES: "db467a33-3486-439a-9a26-11864fb55be6",
@@ -213,40 +215,35 @@ class WishService {
         };
     
         const weekOrder = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"];
-    
         const wishesWithRoutines = await this.getWishesWithLists(userId);
-    
+        
         const routinesByDay = {};
     
         wishesWithRoutines.forEach(wish => {
             if (wish.is_routine) {
                 const routines = wish.routines;
-    
                 routines.forEach(routine => {
                     const dayKey = Object.keys(dias).find(day => dias[day] === routine.week_day_id);
-    
                     if (dayKey) {
                         if (!routinesByDay[dayKey]) {
                             routinesByDay[dayKey] = [];
                         }
-                        routinesByDay[dayKey].push({
-                            wishTitle: wish.title
-                        });
+                        routinesByDay[dayKey].push({ wishTitle: wish.title });
                     }
                 });
             }
         });
     
         const doc = new PDFDocument();
-        const pdfPath = `./routines_${userId}.pdf`;
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=routines_${userId}.pdf`);
     
-        doc.pipe(fs.createWriteStream(pdfPath));
+        doc.pipe(res);
+    
         doc.fontSize(25).text('Rutinas de la semana', { align: 'center' });
         doc.moveDown();
     
         let dayIndex = 0;
-    
-
         let totalRoutines = 0;
         Object.values(routinesByDay).forEach(routines => {
             totalRoutines += routines.length;
@@ -255,7 +252,6 @@ class WishService {
         let printedRoutines = 0;
         while (printedRoutines < totalRoutines) {
             const currentDay = weekOrder[dayIndex % weekOrder.length];
-    
             const routines = routinesByDay[currentDay];
             if (routines && routines.length > 0) {
                 doc.fontSize(20).text(currentDay);
@@ -266,13 +262,10 @@ class WishService {
                 });
                 doc.moveDown();
             }
-    
             dayIndex++;
         }
     
         doc.end();
-    
-        return pdfPath;
     }
 }
 
