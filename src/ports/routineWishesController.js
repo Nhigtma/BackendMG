@@ -56,8 +56,14 @@ class RoutineWishController {
     }
 
     async getWishesWithLists(req, res) {
+        const { user_id } = req.params;
+    
+        if (!user_id) {
+            return res.status(400).json({ message: "El user_id es requerido." });
+        }
+    
         try {
-            const wishesWithLists = await this.wishService.getWishesWithLists();
+            const wishesWithLists = await this.wishService.getWishesWithLists(user_id);
             return res.status(200).json(wishesWithLists);
         } catch (error) {
             console.error('Error en getWishesWithLists:', error.message);
@@ -85,6 +91,30 @@ class RoutineWishController {
             return res.status(200).json(result);
         } catch (error) {
             return res.status(400).json({ message: error.message });
+        }
+    }
+
+    async generatePDF(req, res) {
+        // Asegúrate de que req.params existe
+        console.log(req.params); // Añade esto para depurar
+
+        const { userId } = req.params; // Aquí es donde se genera el error si userId no existe
+
+        if (!userId) {
+            return res.status(400).json({ error: 'El userId es requerido.' });
+        }
+
+        try {
+            const pdfPath = await this.wishService.generatePDF(userId);
+            res.download(pdfPath, (err) => {
+                if (err) {
+                    console.error('Error al enviar el PDF:', err);
+                    res.status(500).send('Error al generar el PDF');
+                }
+            });
+        } catch (error) {
+            console.error('Error al generar el PDF:', error);
+            res.status(500).send('Error al generar el PDF');
         }
     }
 }

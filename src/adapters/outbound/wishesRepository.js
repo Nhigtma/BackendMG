@@ -54,8 +54,20 @@ class WishRepository {
     }
 
     async getWishesWithLists() {
+        await this.initRepository();
         try {
             return await this.repository.find({ where: { is_routine: true, state_id: this.estados.RUTINA } });
+        } catch (error) {
+            console.error('Error en getWishesWithLists', error);
+            throw new Error('Error al obtener los deseos con listas: ' + error.message);
+        }
+    }
+
+    async getAllWisheslist(user_id) {
+        await this.initRepository();
+        try {
+            const wishes = await this.repository.find({ where: { is_routine: true, state_id: this.estados.RUTINA, user_id } });
+            return wishes || [];
         } catch (error) {
             console.error('Error en getWishesWithLists', error);
             throw new Error('Error al obtener los deseos con listas: ' + error.message);
@@ -104,6 +116,7 @@ class WishRepository {
         wish.description = description;
         return await this.repository.save(wish);
     }
+
     async updateWasPerformed(wishId) {
         await this.initRepository();
         const wish = await this.repository.findOne({ where: { id: wishId } });
@@ -111,13 +124,13 @@ class WishRepository {
             throw new Error('Wish not found');
         }
 
-        if (wish.wasperformed) {
+        if (!wish.wasperformed) {
             const userPointsRepo = new UserPointsRepository();
             await userPointsRepo.resetPoints(wish.user_id);
 
             wish.wasperformed = false;
         } else {
-            wish.wasperformed = true;
+            wish.wasperformed = false;
         }
 
         return await this.repository.save(wish);

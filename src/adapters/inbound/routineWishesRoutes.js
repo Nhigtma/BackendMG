@@ -139,7 +139,7 @@ router.get('/wishes/:wishId/routines', authMiddleware, (req, res) => routineWish
 
 /**
  * @swagger
- * /protected/routines/allRoutines:
+ * /protected/routines/allRoutines/{user_id}:
  *   get:
  *     summary: Obtener todos los deseos con sus rutinas
  *     tags: [RoutineWishes]
@@ -190,7 +190,7 @@ router.get('/wishes/:wishId/routines', authMiddleware, (req, res) => routineWish
  *                             week_day_id:
  *                               type: string
  */
-router.get('/allRoutines', authMiddleware, (req, res) => routineWishController.getWishesWithLists(req, res));
+router.get('/allRoutines/:user_id', authMiddleware, (req, res) => routineWishController.getWishesWithLists(req, res));
 
 /**
  * @swagger
@@ -257,5 +257,33 @@ router.put('/wishes/:wishId/routines', authMiddleware, (req, res) => routineWish
  *                   type: string
  */
 router.delete('/wishes/routines/:routineId', authMiddleware, (req, res) => routineWishController.deleteRoutineWish(req, res));
+
+/**
+     * @swagger
+     * /protected/routines/generate-pdf/{userId}:
+     *   post:
+     *     summary: Generar un PDF con rutinas de un usuario
+     *     tags: [Routines]
+     *     security:
+     *       - bearerAuth: []
+     *     parameters:
+     *       - name: userId
+     *         in: path
+     *         required: true
+     *         description: ID del usuario para el que se generará el PDF
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: PDF generado con éxito
+     *         content:
+     *           application/pdf:
+     *             schema:
+     *               type: string
+     *               format: binary
+     *       500:
+     *         description: Error al generar el PDF
+     */
+router.post('/generate-pdf/:userId', authMiddleware, (req, res) => routineWishController.generatePDF(req, res));
 
 module.exports = router;

@@ -3,6 +3,8 @@ const RoutineWishRepository = require('../../adapters/outbound/routineWishReposi
 const routineWishService = require('../../core/services/routineWishesService');
 const UserPointsService = require('../services/userPointsService');
 const HistoryService = require('../services/historyServices');
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 
 
 class WishService {
@@ -83,10 +85,14 @@ class WishService {
         }
     }
 
-    async getWishesWithLists() {
+    async getWishesWithLists(user_id) {
         try {
-            const wishes = await this.wishRepository.getWishesWithLists();
-
+            const wishes = await this.wishRepository.getAllWisheslist(user_id);
+            
+            if (!wishes || wishes.length === 0) {
+                return [];
+            }
+    
             const wishesWithRoutines = await Promise.all(wishes.map(async (wish) => {
                 if (wish.is_routine) {
                     const routines = await this.RoutineWishRepository.getRoutinesByWishId(wish.id);
@@ -97,7 +103,7 @@ class WishService {
                 }
                 return wish;
             }));
-
+    
             return wishesWithRoutines;
         } catch (error) {
             console.error('Error en getWishesWithLists', error);
@@ -159,28 +165,19 @@ class WishService {
         }
     }
 
-    async resetWasPerformed(user_id) {
-        const wishes = await this.getWishesWithLists(user_id);
+    async resetWasPerformed() {
+        const wishes = await this.wishRepository.getWishesWithLists();
         let updated = false;
-
+    
         for (const wish of wishes) {
-            const now = new Date();
-            const lastUpdate = new Date(wish.updated_at);
-            const oneDay = 24 * 60 * 60 * 1000;
-
-            if ((now - lastUpdate) > oneDay) {
-                const updatedWish = await this.wishRepository.updateWasPerformed(wish.id);
-                if (updatedWish) {
-                    updated = true;
-                } else {
-                    return 'No se cumplió con la rutina diaria. Se han reiniciado los puntos y el multiplicador.';
-                }
+            const updatedWish = await this.wishRepository.updateWasPerformed(wish.id);
+            if (updatedWish) {
+                updated = true;
             }
         }
-
+    
         return updated ? 'Rutinas actualizadas correctamente.' : 'No se encontraron rutinas que actualizar.';
     }
-
 
     async updateWeeklyCounter(wish) {
         if (wish.is_routine && wish.wasperformed) {
@@ -202,6 +199,80 @@ class WishService {
             console.error('Error en getWishesByCategory', error);
             throw new Error('Error al obtener los deseos de category: ' + error.message);
         }
+    }
+
+    async generatePDF(userId) {
+        const dias = {
+            LUNES: "3eaf730d-79f4-481b-9779-61f05370bf94",
+            MARTES: "db467a33-3486-439a-9a26-11864fb55be6",
+            MIERCOLES: "004e5c38-9266-4eb0-b71b-05b462c24d30",
+            JUEVES: "6c5d6e27-8594-4999-8129-5a618c869ce5",
+            VIERNES: "c53082d3-12a5-4f0d-b794-ce4fa8d8307e",
+            SABADO: "44079d90-eb72-4216-a887-fc8e130f8ea8",
+            DOMINGO: "d03406b9-ec67-45aa-8454-3e848ac3fcbf"
+        };
+    
+        const weekOrder = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"];
+    
+        const wishesWithRoutines = await this.getWishesWithLists(userId);
+    
+        const routinesByDay = {};
+    
+        wishesWithRoutines.forEach(wish => {
+            if (wish.is_routine) {
+                const routines = wish.routines;
+    
+                routines.forEach(routine => {
+                    const dayKey = Object.keys(dias).find(day => dias[day] === routine.week_day_id);
+    
+                    if (dayKey) {
+                        if (!routinesByDay[dayKey]) {
+                            routinesByDay[dayKey] = [];
+                        }
+                        routinesByDay[dayKey].push({
+                            wishTitle: wish.title
+                        });
+                    }
+                });
+            }
+        });
+    
+        const doc = new PDFDocument();
+        const pdfPath = `./routines_${userId}.pdf`;
+    
+        doc.pipe(fs.createWriteStream(pdfPath));
+        doc.fontSize(25).text('Rutinas de la semana', { align: 'center' });
+        doc.moveDown();
+    
+        let dayIndex = 0;
+    
+
+        let totalRoutines = 0;
+        Object.values(routinesByDay).forEach(routines => {
+            totalRoutines += routines.length;
+        });
+    
+        let printedRoutines = 0;
+        while (printedRoutines < totalRoutines) {
+            const currentDay = weekOrder[dayIndex % weekOrder.length];
+    
+            const routines = routinesByDay[currentDay];
+            if (routines && routines.length > 0) {
+                doc.fontSize(20).text(currentDay);
+                doc.fontSize(14).text('Rutinas:');
+                routines.forEach(routine => {
+                    doc.text(`- ${routine.wishTitle}`);
+                    printedRoutines++;
+                });
+                doc.moveDown();
+            }
+    
+            dayIndex++;
+        }
+    
+        doc.end();
+    
+        return pdfPath;
     }
 }
 

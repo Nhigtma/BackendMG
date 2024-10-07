@@ -1,6 +1,8 @@
 const cron = require('node-cron');
 const WebSocket = require('ws');
 const ReminderService = require('../core/services/remindersService');
+const WishService = require('../core/services/wishService');
+
 const initializeScheduler = (app) => {
     const wss = new WebSocket.Server({ noServer: true });
 
@@ -11,6 +13,7 @@ const initializeScheduler = (app) => {
     });
 
     const reminderService = new ReminderService();
+    const wishService = new WishService();
 
     cron.schedule('* * * * *', async () => {
         try {
@@ -32,6 +35,15 @@ const initializeScheduler = (app) => {
             });
         } catch (error) {
             console.error('Error fetching reminders for notifications:', error);
+        }
+    });
+
+    cron.schedule('0 0 * * *', async () => {
+        try {
+            await wishService.resetWasPerformed();
+            console.log('Rutinas actualizadas correctamente a nivel global.');
+        } catch (error) {
+            console.error('Error actualizando rutinas:', error);
         }
     });
 };

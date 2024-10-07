@@ -254,26 +254,6 @@ router.post('/performRoutine/:wish_id', authMiddleware, (req, res) => wishContro
 
 /**
  * @swagger
- * /protected/wishes/resetWasPerformed/{user_id}:
- *   post:
- *     summary: Reinicia el estado "wasperformed" de las rutinas del usuario
- *     tags: [Wishes]
- *     parameters:
- *       - name: user_id
- *         in: path
- *         required: true
- *         description: ID del usuario
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Estado "wasperformed" reiniciado
- *       500:
- *         description: Error al reiniciar el estado "wasperformed"
- */
-router.post('/resetWasPerformed/:user_id', authMiddleware, (req, res) => wishController.resetWasPerformed(req, res));
-/**
- * @swagger
  * /protected/wishes/category/{category_id}:
  *   get:
  *     summary: Obtiene los deseos pertenecientes a una categoria

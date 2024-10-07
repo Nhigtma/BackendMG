@@ -101,18 +101,6 @@ class WishController {
         }
     }
 
-    async resetWasPerformed(req, res){
-        const {user_id} = req.params;
-
-        try {
-            const resetWasPerformed = await this.wishService.resetWasPerformed(user_id);
-            res.status(200).json(resetWasPerformed);
-        } catch (error) {
-            console.error('Error al aplicar resetWasPerformed: ', error.message);
-            res.status(500).json({error: 'Error al aplicar resetWasPerformed ' + error.message});
-        }
-    }
-
     async getWishByCategory (req,res){
         const {category_id} = req.params;
 
