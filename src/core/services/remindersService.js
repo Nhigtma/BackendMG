@@ -4,16 +4,17 @@ class ReminderService {
     constructor() {
         this.reminderRepository = new ReminderRepository();
     }
-    async createReminder(data) {
-        return await this.reminderRepository.createReminder(data);
+
+    async createReminder(reminderDate, reminderMessage, userId) {
+        return await this.reminderRepository.createReminder(reminderDate, reminderMessage, userId);
     }
 
     async getReminders(userId) {
         return await this.reminderRepository.getAllReminders(userId);
     }
 
-    async updateReminder(id, data) {
-        return await this.reminderRepository.updateReminder(id, data);
+    async updateReminder(id, reminderDate, reminderMessage, isSent) {
+        return await this.reminderRepository.updateReminder(id, reminderDate, reminderMessage, isSent);
     }
 
     async getReminder(id) {
@@ -29,7 +30,7 @@ class ReminderService {
     }
 
     async markAsSent(id) {
-        await this.reminderRepository.updateReminder(id, { is_sent: true });
+        await this.reminderRepository.updateReminderS(id, { is_sent: true });
     }
 }
 

@@ -1,5 +1,5 @@
 const express = require('express');
-const ReminderController = require('../outbound/remindersRepository');
+const ReminderController = require('../../ports/remindersController');
 const authMiddleware = require('../../middleweres/verifyToken');
 
 const router = express.Router();
@@ -39,6 +39,7 @@ const reminderController = new ReminderController();
  *       required:
  *         - reminder_date
  *         - user_id
+ *         - reminder_message
  */
 
 /**

@@ -13,10 +13,14 @@ class ReminderRepository {
         }
     }
 
-    async createReminder(data) {
+    async createReminder(reminderDate, reminderMessage, userId) {
         await this.initRepository(); // Asegúrate de inicializar el repositorio
-        const reminder = this.repository.create(data);
-        await this.repository.save(reminder); // Cambia a this.repository
+        const reminder = this.repository.create({
+            reminder_date: reminderDate,
+            reminder_message: reminderMessage,
+            user_id: userId,
+        });
+        await this.repository.save(reminder);
         return reminder;
     }
 
@@ -25,15 +29,21 @@ class ReminderRepository {
         return await this.repository.find({ where: { user_id: userId } });
     }
 
-    async updateReminder(id, data) {
+    async updateReminder(id, reminderDate, reminderMessage, isSent) {
         await this.initRepository(); // Asegúrate de inicializar el repositorio
-        await this.repository.update(id, data);
+        const updateData = {};
+
+        if (reminderDate) updateData.reminder_date = reminderDate;
+        if (reminderMessage) updateData.reminder_message = reminderMessage;
+        if (isSent !== undefined) updateData.is_sent = isSent; // Permite que isSent sea un booleano
+
+        await this.repository.update(id, updateData);
         return this.getReminderById(id);
     }
 
     async getReminderById(id) {
         await this.initRepository(); // Asegúrate de inicializar el repositorio
-        const reminder = await this.repository.findOne({ where: { id } }); // Cambiado a objeto donde
+        const reminder = await this.repository.findOne({ where: { id } });
         if (!reminder) {
             throw new Error('Reminder not found');
         }
@@ -42,7 +52,10 @@ class ReminderRepository {
 
     async deleteReminder(id) {
         await this.initRepository(); // Asegúrate de inicializar el repositorio
-        await this.repository.delete(id);
+        const result = await this.repository.delete(id);
+        if (result.affected === 0) {
+            throw new Error('Reminder not found or already deleted');
+        }
     }
 
     async getAllPendingReminders() {
@@ -54,6 +67,12 @@ class ReminderRepository {
                 is_sent: false,
             },
         });
+    }
+
+    async updateReminderS(id, data) {
+        await this.initRepository(); // Asegúrate de inicializar el repositorio
+        await this.repository.update(id, data);
+        return this.getReminderById(id);
     }
 }
 

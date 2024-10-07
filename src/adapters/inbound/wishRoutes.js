@@ -192,7 +192,7 @@ router.delete('/:id', authMiddleware, (req, res) => wishController.deleteWish(re
 
 /**
  * @swagger
- * /protected/wishes/complete/{wish_id}:
+ * /protected/wishes/complete/{user_id}/{wish_id}:
  *   post:
  *     summary: Marca un deseo como completado
  *     tags: [Wishes]
@@ -219,11 +219,11 @@ router.delete('/:id', authMiddleware, (req, res) => wishController.deleteWish(re
  *       500:
  *         description: Error al completar el deseo
  */
-router.post('/complete/:wish_id', authMiddleware, (req, res) => wishController.completeWish(req, res));
+router.post('/complete/:user_id/:wish_id', authMiddleware, (req, res) => wishController.completeWish(req, res));
 
 /**
  * @swagger
- * /protected/wishes/performRoutine/{wish_id}:
+ * /protected/wishes/performRoutine/{user_id}/{wish_id}:
  *   post:
  *     summary: Marca la rutina del deseo como realizada
  *     tags: [Wishes]
@@ -250,7 +250,7 @@ router.post('/complete/:wish_id', authMiddleware, (req, res) => wishController.c
  *       500:
  *         description: Error al realizar la rutina
  */
-router.post('/performRoutine/:wish_id', authMiddleware, (req, res) => wishController.performRoutine(req, res));
+router.post('/performRoutine/:user_id/:wish_id', authMiddleware, (req, res) => wishController.performRoutine(req, res));
 
 /**
  * @swagger

@@ -30,15 +30,22 @@ const initializeScheduler = (app) => {
             reminders.forEach(reminder => {
                 const reminderDate = new Date(reminder.reminder_date);
                 const now = new Date();
-
-                if (reminderDate <= now && !reminder.is_sent) {
+    
+                // Calcular la diferencia en milisegundos
+                const timeDifference = reminderDate - now;
+    
+                // Verificar si falta 6 minutos (360000 ms)
+                if (timeDifference <= 360000 && timeDifference > 0 && !reminder.is_sent) {
                     const notification = {
+                        type: 'reminder', // Tipo de notificación
                         id: reminder.id,
+                        user_id: reminder.user_id,
+                        timeRemaining: reminder.reminder_date,
                         message: reminder.reminder_message,
                     };
-
+    
                     sendNotificationToClients(wss, notification);
-
+    
                     reminderService.markAsSent(reminder.id);
                 }
             });
@@ -46,12 +53,11 @@ const initializeScheduler = (app) => {
             console.error('Error fetching reminders for notifications:', error);
         }
     });
-
     // Evaluación de usuarios todos los días a las 12 del mediodía
     cron.schedule('0 12 * * *', async () => {
         try {
             // Obtener todos los usuarios
-            const users = await userService.getAllUsers(); // Suponiendo que existe un método para obtener todos los usuarios.
+            const users = await userService.getAllUsers();
 
             for (const user of users) {
                 const currentPoints = await userPointsService.getCurrentPoints(user.id);
@@ -61,16 +67,19 @@ const initializeScheduler = (app) => {
                 const performanceEvaluation = evaluatePerformance(currentPoints, highestScore);
                 
                 let message;
+                let type;
                 if (performanceEvaluation >= 40) {
                     const congratulationMessages = await messageService.getMessages('congratulation');
                     message = selectMessage(congratulationMessages);
+                    type = 'evaluation'; // Tipo de notificación
                 } else {
                     const motivationMessages = await messageService.getMessages('motivation');
                     message = selectMessage(motivationMessages);
+                    type = 'evaluation'; // Tipo de notificación
                 }
 
                 // Enviar la notificación al usuario
-                sendNotificationToClients(wss, { userId: user.id, message });
+                sendNotificationToClients(wss, { type, userId: user.id, message });
             }
 
             console.log('Evaluaciones de usuarios completadas.');
@@ -79,10 +88,18 @@ const initializeScheduler = (app) => {
         }
     });
 
+    // Resetear rutinas todos los días a la medianoche
     cron.schedule('0 0 * * *', async () => {
         try {
-            await  wishService.resetWasPerformed();
+            await wishService.resetWasPerformed();
             console.log('Rutinas actualizadas correctamente a nivel global.');
+            
+            // Enviar notificación de rutina
+            const notification = {
+                type: 'routine', // Tipo de notificación
+                message: 'Las rutinas han sido actualizadas correctamente.',
+            };
+            sendNotificationToClients(wss, notification);
         } catch (error) {
             console.error('Error actualizando rutinas:', error);
         }
@@ -91,7 +108,6 @@ const initializeScheduler = (app) => {
 
 // Función para seleccionar un mensaje basado en la probabilidad de uso
 const selectMessage = (messages) => {
-    // Implementa la lógica para seleccionar un mensaje en base a su probabilidad de uso
     const totalProbability = messages.reduce((sum, msg) => sum + msg.usageProbability, 0);
     const random = Math.random() * totalProbability;
     let cumulativeProbability = 0;
@@ -99,8 +115,7 @@ const selectMessage = (messages) => {
     for (const msg of messages) {
         cumulativeProbability += msg.usageProbability;
         if (random <= cumulativeProbability) {
-            // Actualizar la probabilidad de uso del mensaje
-            const newProbability = Math.max(msg.usageProbability - 10, 10); // Disminuir la probabilidad
+            const newProbability = Math.max(msg.usageProbability - 10, 10);
             messageService.updateMessageProbability(msg.id, newProbability);
             return msg.content; // Retornar el contenido del mensaje seleccionado
         }

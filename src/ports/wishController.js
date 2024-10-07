@@ -77,7 +77,7 @@ class WishController {
 
     async completeWish(req, res) {
         const {wish_id} = req.params;
-        const {user_id} = req.body;
+        const {user_id} = req.params;
 
         try {
             const completeWish = await this.wishService.completeWish(wish_id, user_id);
@@ -90,7 +90,7 @@ class WishController {
 
     async performRoutine (req, res) {
         const {wish_id} = req.params;
-        const {user_id} = req.body;
+        const {user_id} = req.params;
 
         try {
             const performRoutine = await this.wishService.performRoutine(wish_id, user_id);

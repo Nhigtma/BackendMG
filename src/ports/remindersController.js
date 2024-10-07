@@ -1,12 +1,14 @@
-const reminderService = require('../core/services/remindersService');
+const ReminderService = require('../core/services/remindersService');
 
 class ReminderController {
-    constructor(){
-        this.reminderService = new reminderService();
+    constructor() {
+        this.reminderService = new ReminderService();
     }
+
     async createReminder(req, res) {
         try {
-            const reminder = await this.reminderService.createReminder(req.body);
+            const { reminder_date, reminder_message, user_id } = req.body; // Desestructuramos los valores de la solicitud
+            const reminder = await this.reminderService.createReminder(reminder_date, reminder_message, user_id);
             res.status(201).json(reminder);
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -24,7 +26,8 @@ class ReminderController {
 
     async updateReminder(req, res) {
         try {
-            const updatedReminder = await this.reminderService.updateReminder(req.params.id, req.body);
+            const { reminder_date, reminder_message, is_sent } = req.body; // Desestructuramos los valores de la solicitud
+            const updatedReminder = await this.reminderService.updateReminder(req.params.id, reminder_date, reminder_message, is_sent);
             res.status(200).json(updatedReminder);
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -50,4 +53,4 @@ class ReminderController {
     }
 }
 
-module.exports = new ReminderController();
+module.exports = ReminderController;
