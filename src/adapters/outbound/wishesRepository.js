@@ -24,11 +24,22 @@ class WishRepository {
     async createWish(title, description, user_id, category_id, state_id, weekly_counter, wasperformed) {
         await this.initRepository();
         const wish = this.repository.create({ title, description, user_id, category_id, state_id, weekly_counter, wasperformed });
+        console.log('datos de creacion: '+wish);
         return await this.repository.save(wish);
     }
     async createWishRoutine(title, description, user_id, category_id, is_routine, state_id, weekly_counter, wasperformed) {
         await this.initRepository();
         const wish = this.repository.create({ title, description, user_id, category_id, is_routine, state_id, weekly_counter, wasperformed });
+        console.log('Creando nuevo deseo con los siguientes datos:', {
+            title,
+            description,
+            user_id,
+            category_id,
+            is_routine,
+            state_id,
+            weekly_counter,
+            wasperformed
+        });
         return await this.repository.save(wish);
     }
 
