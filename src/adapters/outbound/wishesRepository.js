@@ -26,7 +26,7 @@ class WishRepository {
         const wish = this.repository.create({ title, description, user_id, category_id, state_id, weekly_counter, wasperformed });
         return await this.repository.save(wish);
     }
-    async createWishRoutine(title, description, user_id, category_id, is_routine, weekly_counter, wasperformed) {
+    async createWishRoutine(title, description, user_id, category_id, is_routine, state_id, weekly_counter, wasperformed) {
         await this.initRepository();
         const wish = this.repository.create({ title, description, user_id, category_id, is_routine, state_id, weekly_counter, wasperformed });
         return await this.repository.save(wish);
@@ -75,7 +75,6 @@ class WishRepository {
             throw new Error('Error al obtener los deseos de la categoría.');
         }
     }
-    
 
     async getWishesFinalizados(user_id) {
         try {
