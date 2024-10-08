@@ -1,7 +1,6 @@
 const HistoryService = require('./historyServices');
 const UserPointsService = require('./userPointsService');
 const MessageService = require('./MessageService');
-const NotificationService = require('./notificationService.js');
 const { createNeuralNetwork, evaluatePerformance } = require('../../config/neuralNetworkConfig');
 
 class PerformanceService {
@@ -9,26 +8,26 @@ class PerformanceService {
         this.historyService = new HistoryService();
         this.userPointsService = new UserPointsService();
         this.messageService = new MessageService();
-        this.notificationService = new NotificationService();
         this.network = createNeuralNetwork();
     }
 
-    async evaluateUserPerformance(userId) {
+    async evaluateUserPerformance(userId, sendNotification) {
         const [currentPoints, highestScore] = await Promise.all([
             this.userPointsService.getCurrentPoints(userId),
             this.historyService.getHistoryByUserId(userId),
         ]);
 
-        const performance = evaluatePerformance(this.network, currentPoints.points, highestScore.highest_score);
-        
-        const messageType = performance ? 'congratulation' : 'motivation';
+        const performanceScore = evaluatePerformance(this.network, currentPoints.points, highestScore.highest_score);
+        const performancePercentage = performanceScore * 100;
+
+        const messageType = performancePercentage >= 40 ? 'congratulation' : 'motivation';
         const messages = await this.messageService.getMessages(messageType);
-        
         const selectedMessage = messages[Math.floor(Math.random() * messages.length)];
-        
-        await this.notificationService.sendNotification(userId, selectedMessage.content);
-        
+
+        await sendNotification(userId, selectedMessage.content);
         await this.messageService.updateMessageProbability(selectedMessage.id, selectedMessage.usageProbability - 5);
+
+        return performancePercentage;
     }
 }
 

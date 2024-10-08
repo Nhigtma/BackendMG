@@ -1,9 +1,7 @@
-const PerformanceService = require('./performanceService');
 const MessageService = require('./MessageService');
 
 class NotificationService {
     constructor() {
-        this.performanceService = new PerformanceService();
         this.messageService = new MessageService();
     }
 
@@ -14,15 +12,14 @@ class NotificationService {
             message: messageContent,
         };
 
-
         sendNotificationToClients(notification);
     }
 
-    async evaluateAllUsers() {
+    async evaluateAllUsers(performanceService) {
         try {
             const users = await getAllUsers();
             for (const user of users) {
-                await this.performanceService.evaluateUserPerformance(user.id);
+                await performanceService.evaluateUserPerformance(user.id, this.sendNotification.bind(this));
             }
             console.log('Evaluación de rendimiento completada para todos los usuarios.');
         } catch (error) {

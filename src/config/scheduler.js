@@ -2,10 +2,10 @@ const cron = require('node-cron');
 const WebSocket = require('ws');
 const ReminderService = require('../core/services/remindersService');
 const WishService = require('../core/services/wishService');
-const UserPointsService = require('../core/services/userPointsService');
-const HistoryService = require('../core/services/historyServices');
 const MessageService = require('../core/services/MessageService');
 const UserService = require('../core/services/userService');
+const PerformanceService = require('../core/services/performanceService');
+const NotificationService = require('../core/services/notificationService');
 
 const initializeScheduler = (app) => {
     const wss = new WebSocket.Server({ noServer: true });
@@ -17,11 +17,11 @@ const initializeScheduler = (app) => {
     });
 
     const reminderService = new ReminderService();
-    const userPointsService = new UserPointsService();
-    const historyService = new HistoryService();
     const messageService = new MessageService();
     const userService = new UserService();
     const wishService = new WishService();
+    const performanceService = new PerformanceService();
+    const notificationService = new NotificationService();
 
     // Verificación de recordatorios cada 5 minutos
     cron.schedule('*/5 * * * *', async () => {
@@ -30,22 +30,19 @@ const initializeScheduler = (app) => {
             reminders.forEach(reminder => {
                 const reminderDate = new Date(reminder.reminder_date);
                 const now = new Date();
-    
-                // Calcular la diferencia en milisegundos
+
                 const timeDifference = reminderDate - now;
-    
-                // Verificar si falta 6 minutos (360000 ms)
+
                 if (timeDifference <= 360000 && timeDifference > 0 && !reminder.is_sent) {
                     const notification = {
-                        type: 'reminder', // Tipo de notificación
+                        type: 'reminder',
                         id: reminder.id,
                         user_id: reminder.user_id,
                         timeRemaining: reminder.reminder_date,
                         message: reminder.reminder_message,
                     };
-    
+
                     sendNotificationToClients(wss, notification);
-    
                     reminderService.markAsSent(reminder.id);
                 }
             });
@@ -53,19 +50,15 @@ const initializeScheduler = (app) => {
             console.error('Error fetching reminders for notifications:', error);
         }
     });
+
     // Evaluación de usuarios todos los días a las 12 del mediodía
-    cron.schedule('0 12 * * *', async () => {
+    cron.schedule('22 19 * * *', async () => {
         try {
-            // Obtener todos los usuarios
             const users = await userService.getAllUsers();
 
             for (const user of users) {
-                const currentPoints = await userPointsService.getCurrentPoints(user.id);
-                const highestScore = await historyService.getHistoryByUserId(user.id);
+                const performanceEvaluation = await performanceService.evaluateUserPerformance(user.id, notificationService.sendNotification.bind(notificationService));
 
-                // Lógica de evaluación usando la red neuronal
-                const performanceEvaluation = evaluatePerformance(currentPoints, highestScore);
-                
                 let message;
                 let type;
                 if (performanceEvaluation >= 40) {
@@ -93,7 +86,7 @@ const initializeScheduler = (app) => {
         try {
             await wishService.resetWasPerformed();
             console.log('Rutinas actualizadas correctamente a nivel global.');
-            
+
             // Enviar notificación de rutina
             const notification = {
                 type: 'routine', // Tipo de notificación
