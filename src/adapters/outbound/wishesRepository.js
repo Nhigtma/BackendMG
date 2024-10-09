@@ -24,7 +24,7 @@ class WishRepository {
     async createWish(title, description, user_id, category_id, state_id, weekly_counter, wasperformed) {
         await this.initRepository();
         const wish = this.repository.create({ title, description, user_id, category_id, state_id, weekly_counter, wasperformed });
-        console.log('datos de creacion: '+wish);
+        console.log('datos de creacion: ' + wish);
         return await this.repository.save(wish);
     }
     async createWishRoutine(title, description, user_id, category_id, is_routine, state_id, weekly_counter, wasperformed) {
@@ -81,17 +81,17 @@ class WishRepository {
             if (!category_id || !isUuid(category_id)) {
                 throw new Error('El ID de la categoría es inválido o requerido.');
             }
-    
+
             const wishes = await this.repository.find({
                 where: { category_id }
             });
-    
+
             console.log(`Deseos encontrados:`, wishes);
-    
+
             if (wishes.length === 0) {
                 console.log(`No se encontraron deseos para la categoría con ID: ${category_id}`);
             }
-    
+
             return wishes;
         } catch (error) {
             console.error('Error en getWishesByCategory:', error.message || error);

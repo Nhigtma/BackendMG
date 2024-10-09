@@ -13,19 +13,23 @@ class CommentRepository {
     }
 
     async createComment(id_wish, comment_text) {
+        await this.initRepository()
         const newComment = this.repository.create(id_wish, comment_text);
         return await this.repository.save(newComment);
     }
 
     async getCommentsByWishId(wish_id) {
+        await this.initRepository()
         return await this.repository.find({ where: { wish_id } });
     }
 
     async deleteComment(id) {
+        await this.initRepository()
         return await this.repository.delete(id);
     }
 
     async updateComment(id, comment_text) {
+        await this.initRepository()
         return await this.repository.update(id, comment_text);
     }
 }

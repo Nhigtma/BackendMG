@@ -7,7 +7,7 @@ class ReminderController {
 
     async createReminder(req, res) {
         try {
-            const { reminder_date, reminder_message, user_id } = req.body; // Desestructuramos los valores de la solicitud
+            const { reminder_date, reminder_message, user_id } = req.body;
             const reminder = await this.reminderService.createReminder(reminder_date, reminder_message, user_id);
             res.status(201).json(reminder);
         } catch (error) {
@@ -26,7 +26,7 @@ class ReminderController {
 
     async updateReminder(req, res) {
         try {
-            const { reminder_date, reminder_message, is_sent } = req.body; // Desestructuramos los valores de la solicitud
+            const { reminder_date, reminder_message, is_sent } = req.body;
             const updatedReminder = await this.reminderService.updateReminder(req.params.id, reminder_date, reminder_message, is_sent);
             res.status(200).json(updatedReminder);
         } catch (error) {

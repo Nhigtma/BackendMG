@@ -110,58 +110,69 @@ class RoutineWishController {
         };
     
         const weekOrder = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"];
+        
         const wishesWithRoutines = await this.wishService.getWishesWithLists(userId);
         
         const routinesByDay = {};
     
         wishesWithRoutines.forEach(wish => {
             if (wish.is_routine) {
-                const routines = wish.routines;
-                routines.forEach(routine => {
+                wish.routines.forEach(routine => {
                     const dayKey = Object.keys(dias).find(day => dias[day] === routine.week_day_id);
                     if (dayKey) {
                         if (!routinesByDay[dayKey]) {
                             routinesByDay[dayKey] = [];
                         }
-                        routinesByDay[dayKey].push({ wishTitle: wish.title });
+                        routinesByDay[dayKey].push({ wishTitle: routine.routines });
                     }
                 });
             }
         });
     
-        const doc = new PDFDocument();
+        const doc = new PDFDocument({ size: 'A4', layout: 'landscape' });
+        
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename=routines_${userId}.pdf`);
-    
+        
         doc.pipe(res);
-    
-        doc.fontSize(25).text('Rutinas de la semana', { align: 'center' });
+        doc.fontSize(25).text('Rutinas de la Semana', { align: 'center' });
         doc.moveDown();
     
-        let dayIndex = 0;
-        let totalRoutines = 0;
-        Object.values(routinesByDay).forEach(routines => {
-            totalRoutines += routines.length;
+        const cellWidth = (doc.page.width - 100) / weekOrder.length;
+        const startX = 50;
+        let startY = doc.y;
+        const lineHeight = 25;
+        const fontSize = 15;
+    
+        weekOrder.forEach((day, index) => {
+            const textY = startY + (lineHeight - 10) / 2;
+            doc.fontSize(fontSize).font('Helvetica-Bold').text(day, startX + index * cellWidth, textY, { width: cellWidth, align: 'center' });
+        });
+        startY += lineHeight;
+    
+        const maxRoutines = Math.max(...weekOrder.map(day => (routinesByDay[day] || []).length));
+    
+        weekOrder.forEach((_, index) => {
+            const x = startX + index * cellWidth;
+            const y = startY - lineHeight;
+            doc.rect(x, y, cellWidth, lineHeight + (maxRoutines * lineHeight)).stroke();
         });
     
-        let printedRoutines = 0;
-        while (printedRoutines < totalRoutines) {
-            const currentDay = weekOrder[dayIndex % weekOrder.length];
-            const routines = routinesByDay[currentDay];
-            if (routines && routines.length > 0) {
-                doc.fontSize(20).text(currentDay);
-                doc.fontSize(14).text('Rutinas:');
-                routines.forEach(routine => {
-                    doc.text(`- ${routine.wishTitle}`);
-                    printedRoutines++;
-                });
-                doc.moveDown();
-            }
-            dayIndex++;
+        for (let rowIndex = 0; rowIndex < maxRoutines; rowIndex++) {
+            weekOrder.forEach((day, index) => {
+                const routine = routinesByDay[day] ? routinesByDay[day][rowIndex] : null;
+                const text = routine ? routine.wishTitle : '';
+                const yPosition = startY + lineHeight * rowIndex;
+                const textY = yPosition + (lineHeight - 10) / 2;
+                doc.fontSize(fontSize).font('Helvetica').text(text, startX + index * cellWidth, textY, { width: cellWidth, align: 'center' });
+                const cellX = startX + index * cellWidth;
+                doc.rect(cellX, yPosition, cellWidth, lineHeight).stroke();
+            });
         }
     
         doc.end();
     }
+    
 }
 
 module.exports = RoutineWishController;

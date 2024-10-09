@@ -6,7 +6,6 @@ class NotificationService {
     }
 
     async sendNotification(userId, messageContent) {
-        // Lógica para enviar la notificación usando WebSocket
         const notification = {
             userId,
             message: messageContent,

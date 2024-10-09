@@ -23,17 +23,23 @@ const initializeScheduler = (app) => {
     const performanceService = new PerformanceService();
     const notificationService = new NotificationService();
 
-    // Verificación de recordatorios cada 5 minutos
-    cron.schedule('*/5 * * * *', async () => {
+    cron.schedule('*/3 * * * *', async () => {
         try {
             const reminders = await reminderService.getPendingReminders();
-            reminders.forEach(reminder => {
+            const now = new Date();
+
+            reminders.forEach(async (reminder) => {
                 const reminderDate = new Date(reminder.reminder_date);
-                const now = new Date();
+
+                if (reminderDate < now) {
+                    console.log(`Eliminando recordatorio antiguo con ID: ${reminder.id}`);
+                    await reminderService.deleteReminder(reminder.id);
+                    return;
+                }
 
                 const timeDifference = reminderDate - now;
 
-                if (timeDifference <= 360000 && timeDifference > 0 && !reminder.is_sent) {
+                if (timeDifference <= 180000 && timeDifference > 0 && !reminder.is_sent) {
                     const notification = {
                         type: 'reminder',
                         id: reminder.id,
@@ -43,7 +49,7 @@ const initializeScheduler = (app) => {
                     };
 
                     sendNotificationToClients(wss, notification);
-                    reminderService.markAsSent(reminder.id);
+                    await reminderService.markAsSent(reminder.id);
                 }
             });
         } catch (error) {
@@ -51,7 +57,6 @@ const initializeScheduler = (app) => {
         }
     });
 
-    // Evaluación de usuarios todos los días a las 12 del mediodía
     cron.schedule('22 19 * * *', async () => {
         try {
             const users = await userService.getAllUsers();
@@ -64,14 +69,13 @@ const initializeScheduler = (app) => {
                 if (performanceEvaluation >= 40) {
                     const congratulationMessages = await messageService.getMessages('congratulation');
                     message = selectMessage(congratulationMessages);
-                    type = 'evaluation'; // Tipo de notificación
+                    type = 'evaluation';
                 } else {
                     const motivationMessages = await messageService.getMessages('motivation');
                     message = selectMessage(motivationMessages);
-                    type = 'evaluation'; // Tipo de notificación
+                    type = 'evaluation';
                 }
 
-                // Enviar la notificación al usuario
                 sendNotificationToClients(wss, { type, userId: user.id, message });
             }
 
@@ -81,15 +85,13 @@ const initializeScheduler = (app) => {
         }
     });
 
-    // Resetear rutinas todos los días a la medianoche
     cron.schedule('0 0 * * *', async () => {
         try {
             await wishService.resetWasPerformed();
             console.log('Rutinas actualizadas correctamente a nivel global.');
 
-            // Enviar notificación de rutina
             const notification = {
-                type: 'routine', // Tipo de notificación
+                type: 'routine',
                 message: 'Las rutinas han sido actualizadas correctamente.',
             };
             sendNotificationToClients(wss, notification);
@@ -99,7 +101,6 @@ const initializeScheduler = (app) => {
     });
 };
 
-// Función para seleccionar un mensaje basado en la probabilidad de uso
 const selectMessage = (messages) => {
     const totalProbability = messages.reduce((sum, msg) => sum + msg.usageProbability, 0);
     const random = Math.random() * totalProbability;
@@ -110,10 +111,10 @@ const selectMessage = (messages) => {
         if (random <= cumulativeProbability) {
             const newProbability = Math.max(msg.usageProbability - 10, 10);
             messageService.updateMessageProbability(msg.id, newProbability);
-            return msg.content; // Retornar el contenido del mensaje seleccionado
+            return msg.content;
         }
     }
-    return null; // En caso de que no se seleccione ningún mensaje
+    return null;
 };
 
 const sendNotificationToClients = (wss, message) => {

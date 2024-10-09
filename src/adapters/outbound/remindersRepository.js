@@ -1,6 +1,6 @@
 const { AppDataSource } = require('../../config/ormConfig');
 const Reminder = require('../../core/models/reminders');
-const { LessThan } = require('typeorm'); // Asegúrate de importar LessThan
+const { LessThan } = require('typeorm');
 
 class ReminderRepository {
     constructor() {
@@ -14,7 +14,7 @@ class ReminderRepository {
     }
 
     async createReminder(reminderDate, reminderMessage, userId) {
-        await this.initRepository(); // Asegúrate de inicializar el repositorio
+        await this.initRepository();
         const reminder = this.repository.create({
             reminder_date: reminderDate,
             reminder_message: reminderMessage,
@@ -25,24 +25,24 @@ class ReminderRepository {
     }
 
     async getAllReminders(userId) {
-        await this.initRepository(); // Asegúrate de inicializar el repositorio
+        await this.initRepository();
         return await this.repository.find({ where: { user_id: userId } });
     }
 
     async updateReminder(id, reminderDate, reminderMessage, isSent) {
-        await this.initRepository(); // Asegúrate de inicializar el repositorio
+        await this.initRepository();
         const updateData = {};
 
         if (reminderDate) updateData.reminder_date = reminderDate;
         if (reminderMessage) updateData.reminder_message = reminderMessage;
-        if (isSent !== undefined) updateData.is_sent = isSent; // Permite que isSent sea un booleano
+        if (isSent !== undefined) updateData.is_sent = isSent;
 
         await this.repository.update(id, updateData);
         return this.getReminderById(id);
     }
 
     async getReminderById(id) {
-        await this.initRepository(); // Asegúrate de inicializar el repositorio
+        await this.initRepository();
         const reminder = await this.repository.findOne({ where: { id } });
         if (!reminder) {
             throw new Error('Reminder not found');
@@ -51,7 +51,7 @@ class ReminderRepository {
     }
 
     async deleteReminder(id) {
-        await this.initRepository(); // Asegúrate de inicializar el repositorio
+        await this.initRepository();
         const result = await this.repository.delete(id);
         if (result.affected === 0) {
             throw new Error('Reminder not found or already deleted');
@@ -59,7 +59,7 @@ class ReminderRepository {
     }
 
     async getAllPendingReminders() {
-        await this.initRepository(); // Asegúrate de inicializar el repositorio
+        await this.initRepository();
         const currentDate = new Date();
         return await this.repository.find({
             where: {
@@ -70,7 +70,7 @@ class ReminderRepository {
     }
 
     async updateReminderS(id, data) {
-        await this.initRepository(); // Asegúrate de inicializar el repositorio
+        await this.initRepository();
         await this.repository.update(id, data);
         return this.getReminderById(id);
     }
