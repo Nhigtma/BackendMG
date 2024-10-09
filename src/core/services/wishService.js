@@ -74,6 +74,20 @@ class WishService {
         }
     }
 
+    async getWishesFinalized(user_id) {
+        try {
+            const wish = await this.wishRepository.getWishesFinalizados(user_id);
+            const history = await this.historyService.getHistory(user_id);
+
+            return {
+                wish, history
+            }
+        } catch (error) {
+            console.error('Error en getWishesFinalized', error);
+            throw new Error('Error al obtener los deseos finalizados: ' + error.message);
+        }
+    }
+
     async getAllWishes(user_id) {
         try {
             return await this.wishRepository.getAllWishes(user_id);

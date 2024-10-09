@@ -1,6 +1,5 @@
 const { AppDataSource } = require('../../config/ormConfig');
 const History = require('../../core/models/history');
-const wishesRepository = require('../outbound/wishesRepository');
 
 class HistoryRepository {
     constructor() {
@@ -18,16 +17,9 @@ class HistoryRepository {
         
         const history = await this.repository.findOne({ where: { user_id } });
         
-        const wishesRepo = new wishesRepository();
-        const wishes = await wishesRepo.getWishesFinalizados(user_id);
-        
 
-        return {
-            history,
-            wishes
-        };
+        return history
     }
-
     async addToHistory(user_id) {
         await this.initRepository();
         const historyEntry = this.repository.create({ user_id });

@@ -1,15 +1,15 @@
-const HistoryService = require('../core/services/historyServices');
+const WishService    = require('../core/services/wishService');
 
 class HistoryController {
     constructor(){
-        this.historyService = new HistoryService();
+        this.wishService = new WishService();
     }
 
     async getHistory (req, res){
         const {user_id} = req.param;
 
         try {
-            const getHistory = await this.historyService.getHistory(user_id);
+            const getHistory = await this.wishService.getWishesFinalized(user_id);
             res.status(201).json(getHistory);
         } catch (error) {
             console.error('Error en getHistory:', error);

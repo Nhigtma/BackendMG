@@ -101,6 +101,7 @@ class WishRepository {
 
     async getWishesFinalizados(user_id) {
         try {
+            await this.initRepository();
             return await this.repository.find({ where: { user_id, state_id: this.estados.FINALIZADA } });
         } catch (error) {
             console.error('Error en getWishesFinalizados', error);
