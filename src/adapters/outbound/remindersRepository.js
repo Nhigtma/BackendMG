@@ -1,6 +1,6 @@
 const { AppDataSource } = require('../../config/ormConfig');
 const Reminder = require('../../core/models/reminders');
-const { LessThan } = require('typeorm');
+const { Between } = require('typeorm');
 
 class ReminderRepository {
     constructor() {
@@ -61,9 +61,13 @@ class ReminderRepository {
     async getAllPendingReminders() {
         await this.initRepository();
         const currentDate = new Date();
+
+        const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 0, 0, 0);
+        const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 23, 59, 59);
+
         return await this.repository.find({
             where: {
-                reminder_date: LessThan(currentDate),
+                reminder_date: Between(startOfDay, endOfDay),
                 is_sent: false,
             },
         });

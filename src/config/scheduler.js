@@ -23,23 +23,23 @@ const initializeScheduler = (app) => {
     const performanceService = new PerformanceService();
     const notificationService = new NotificationService();
 
-    cron.schedule('*/3 * * * *', async () => {
+    cron.schedule('*/1 * * * *', async () => {
         try {
+            console.log('Iniciando la verificación de recordatorios...');
+
             const reminders = await reminderService.getPendingReminders();
+            console.log(`Se han obtenido ${reminders.length} recordatorios pendientes:`, reminders);
+
             const now = new Date();
+            const notificationsToSend = [];
 
-            reminders.forEach(async (reminder) => {
+            reminders.forEach((reminder) => {
                 const reminderDate = new Date(reminder.reminder_date);
-
-                if (reminderDate < now) {
-                    console.log(`Eliminando recordatorio antiguo con ID: ${reminder.id}`);
-                    await reminderService.deleteReminder(reminder.id);
-                    return;
-                }
-
                 const timeDifference = reminderDate - now;
 
-                if (timeDifference <= 180000 && timeDifference > 0 && !reminder.is_sent) {
+                console.log(`Evaluando recordatorio ID: ${reminder.id}, Fecha: ${reminderDate}, Diferencia de tiempo: ${timeDifference} ms`);
+
+                if (timeDifference <= 60000 && timeDifference > 0 && !reminder.is_sent) {
                     const notification = {
                         type: 'reminder',
                         id: reminder.id,
@@ -48,14 +48,42 @@ const initializeScheduler = (app) => {
                         message: reminder.reminder_message,
                     };
 
-                    sendNotificationToClients(wss, notification);
-                    await reminderService.markAsSent(reminder.id);
+                    notificationsToSend.push(notification);
+                    console.log('Notificación a enviar:', notification);
+                } else {
+                    console.log(`Recordatorio ID: ${reminder.id} no requiere envío.`);
                 }
             });
+
+            if (notificationsToSend.length > 0) {
+                notificationsToSend.forEach(async (notification) => {
+                    console.log(`Enviando notificación:`, notification);
+                    await sendNotificationToClients(wss, notification);
+                    await reminderService.markAsSent(notification.id);
+                    console.log(`Recordatorio ID: ${notification.id} marcado como enviado.`);
+                });
+            } else {
+                console.log('No hay notificaciones para enviar en este ciclo.');
+            }
+
+            reminders.forEach(async (reminder) => {
+                const reminderDate = new Date(reminder.reminder_date);
+                const minutesDifference = (now - reminderDate) / 60000;
+
+                if (minutesDifference >= 1) {
+                    console.log(`Eliminando recordatorio antiguo con ID: ${reminder.id}, Diferencia en minutos: ${minutesDifference.toFixed(2)}`);
+                    await reminderService.deleteReminder(reminder.id);
+                    console.log(`Recordatorio ID: ${reminder.id} eliminado.`);
+                } else {
+                    console.log(`Recordatorio ID: ${reminder.id} aún es válido. No se eliminará.`);
+                }
+            });
+
         } catch (error) {
-            console.error('Error fetching reminders for notifications:', error);
+            console.error('Error al verificar los recordatorios para enviar notificaciones:', error);
         }
     });
+
 
     cron.schedule('22 19 * * *', async () => {
         try {
@@ -85,14 +113,14 @@ const initializeScheduler = (app) => {
         }
     });
 
-    cron.schedule('0 0 * * *', async () => {
+    cron.schedule('44 15 * * *', async () => {
         try {
             await wishService.resetWasPerformed();
             console.log('Rutinas actualizadas correctamente a nivel global.');
 
             const notification = {
                 type: 'routine',
-                message: 'Las rutinas han sido actualizadas correctamente.',
+                message: 'Las rutinas han sido reseteadas correctamente',
             };
             sendNotificationToClients(wss, notification);
         } catch (error) {
